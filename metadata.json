@@ -1,0 +1,6 @@
+{
+  "name": "EduLive+",
+  "description": "Enterprise-Grade AI-Powered Live Learning, Video Streaming, AI Tutor, Tests & Offline Course ecosystem for students and educators.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
