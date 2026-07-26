@@ -7,10 +7,20 @@ import androidx.room.RoomDatabase
 import com.example.data.model.AttemptEntity
 import com.example.data.model.BookmarkEntity
 import com.example.data.model.DownloadEntity
+import com.example.data.model.LiveChatMessageEntity
+import com.example.data.model.LiveSessionEntity
+import com.example.data.model.UserSessionEntity
 
 @Database(
-    entities = [DownloadEntity::class, BookmarkEntity::class, AttemptEntity::class],
-    version = 1,
+    entities = [
+        DownloadEntity::class,
+        BookmarkEntity::class,
+        AttemptEntity::class,
+        LiveSessionEntity::class,
+        LiveChatMessageEntity::class,
+        UserSessionEntity::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

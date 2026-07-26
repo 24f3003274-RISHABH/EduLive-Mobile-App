@@ -200,3 +200,44 @@ data class AttemptEntity(
     val unattemptedCount: Int,
     val timestamp: Long = System.currentTimeMillis()
 )
+
+@Entity(tableName = "live_sessions")
+data class LiveSessionEntity(
+    @PrimaryKey val id: String,
+    val title: String,
+    val courseTitle: String,
+    val instructorName: String,
+    val targetExamName: String,
+    val status: String,
+    val viewerCount: Int,
+    val startTimeFormatted: String,
+    val streamUrl: String,
+    val streamKey: String,
+    val shareLink: String,
+    val maxStudentsCapacity: Int,
+    val description: String,
+    val createdAt: Long = System.currentTimeMillis()
+)
+
+@Entity(tableName = "live_chat_messages")
+data class LiveChatMessageEntity(
+    @PrimaryKey val id: String,
+    val sessionId: String,
+    val senderName: String,
+    val text: String,
+    val timestamp: String,
+    val isTeacher: Boolean,
+    val isDoubtQuestion: Boolean,
+    val createdAt: Long = System.currentTimeMillis()
+)
+
+@Entity(tableName = "user_sessions")
+data class UserSessionEntity(
+    @PrimaryKey val userId: String,
+    val name: String,
+    val email: String,
+    val role: String,
+    val targetExam: String,
+    val isSubscribed: Boolean,
+    val lastActive: Long = System.currentTimeMillis()
+)

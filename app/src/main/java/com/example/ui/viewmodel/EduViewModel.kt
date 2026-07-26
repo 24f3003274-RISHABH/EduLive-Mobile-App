@@ -110,6 +110,9 @@ class EduViewModel(application: Application) : AndroidViewModel(application) {
             maxCapacity = maxCapacity,
             description = description
         )
+        viewModelScope.launch {
+            repository.persistLiveSessionToDb(newSession)
+        }
         _selectedLiveSession.value = newSession
         _currentTab.value = 2
         showToast("📢 Class Scheduled! Share link generated: ${newSession.shareLink}")

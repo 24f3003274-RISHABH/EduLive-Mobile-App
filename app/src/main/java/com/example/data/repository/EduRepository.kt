@@ -289,6 +289,25 @@ class EduRepository(private val dao: AppDao) {
 
     fun getLiveSessions(): List<LiveSession> = _liveSessions.value
 
+    suspend fun persistLiveSessionToDb(session: LiveSession) {
+        val entity = LiveSessionEntity(
+            id = session.id,
+            title = session.title,
+            courseTitle = session.courseTitle,
+            instructorName = session.instructorName,
+            targetExamName = session.targetExam.name,
+            status = session.status,
+            viewerCount = session.viewerCount,
+            startTimeFormatted = session.startTimeFormatted,
+            streamUrl = session.streamUrl,
+            streamKey = session.streamKey,
+            shareLink = session.shareLink,
+            maxStudentsCapacity = session.maxStudentsCapacity,
+            description = session.description
+        )
+        dao.insertLiveSession(entity)
+    }
+
     fun scheduleNewLiveSession(
         title: String,
         subjectCourse: String,
