@@ -236,39 +236,124 @@ class EduRepository(private val dao: AppDao) {
         )
     }
 
-    fun getLiveSessions(): List<LiveSession> {
-        return listOf(
+    private val _liveSessions = MutableStateFlow(
+        listOf(
             LiveSession(
-                id = "live_01",
-                title = "Rotational Mechanics: Moment of Inertia & Rolling ohne Slip",
+                id = "live_jee_01",
+                title = "Rotational Mechanics: Moment of Inertia & Rolling without Slip",
                 courseTitle = "Lakshya JEE 2026 Batch",
                 instructorName = "Prof. Alok Pandey",
                 targetExam = TargetExam.JEE_MAIN,
                 status = "LIVE NOW",
-                viewerCount = 14850,
-                startTimeFormatted = "Started at 10:00 AM"
+                viewerCount = 184,
+                startTimeFormatted = "Started at 10:00 AM",
+                streamUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                streamKey = "jee_physics_101",
+                shareLink = "https://edulive.app/class/jee_physics_101",
+                maxStudentsCapacity = 200,
+                description = "Master rotational motion formulas with live problem solving and instant faculty doubt clearance."
             ),
             LiveSession(
-                id = "live_02",
+                id = "live_neet_02",
                 title = "Human Heart Architecture & Cardiac Cycle In-Depth",
                 courseTitle = "Yakeen NEET 2026 Batch",
                 instructorName = "Dr. Shweta Roy",
                 targetExam = TargetExam.NEET_UG,
                 status = "LIVE NOW",
-                viewerCount = 22400,
-                startTimeFormatted = "Started at 10:15 AM"
+                viewerCount = 196,
+                startTimeFormatted = "Started at 10:15 AM",
+                streamUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                streamKey = "neet_bio_202",
+                shareLink = "https://edulive.app/class/neet_bio_202",
+                maxStudentsCapacity = 250,
+                description = "Complete 3D anatomical walkthrough of cardiac muscle contraction and ECG signal analysis."
             ),
             LiveSession(
-                id = "live_03",
-                title = "Constitutional Amendments & Basic Structure Doctrine",
+                id = "live_upsc_03",
+                title = "Constitutional Amendments & Basic Structure Doctrine Seminar",
                 courseTitle = "Sankalp UPSC CSE 2026",
                 instructorName = "Vikramaditya Singh",
                 targetExam = TargetExam.UPSC_CSE,
                 status = "UPCOMING",
                 viewerCount = 0,
-                startTimeFormatted = "Today at 02:30 PM"
+                startTimeFormatted = "Today at 02:30 PM",
+                streamUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                streamKey = "upsc_polity_303",
+                shareLink = "https://edulive.app/class/upsc_polity_303",
+                maxStudentsCapacity = 300,
+                description = "Special Live Seminar covering Kesavananda Bharati case landmark rulings and Indian polity Mains Q&A."
             )
         )
+    )
+    val liveSessionsFlow: StateFlow<List<LiveSession>> = _liveSessions.asStateFlow()
+
+    fun getLiveSessions(): List<LiveSession> = _liveSessions.value
+
+    fun scheduleNewLiveSession(
+        title: String,
+        subjectCourse: String,
+        instructor: String,
+        exam: TargetExam,
+        timeString: String,
+        streamUrl: String,
+        maxCapacity: Int,
+        description: String
+    ): LiveSession {
+        val cleanKey = "class_" + System.currentTimeMillis().toString().takeLast(6)
+        val shareUrl = "https://edulive.app/class/$cleanKey"
+        val newSession = LiveSession(
+            id = "live_$cleanKey",
+            title = title,
+            courseTitle = subjectCourse,
+            instructorName = instructor,
+            targetExam = exam,
+            status = if (timeString.contains("NOW", ignoreCase = true) || timeString.isBlank()) "LIVE NOW" else "UPCOMING",
+            viewerCount = if (timeString.contains("NOW", ignoreCase = true)) 1 else 0,
+            startTimeFormatted = if (timeString.isNotBlank()) timeString else "Started Just Now",
+            streamUrl = if (streamUrl.isNotBlank()) streamUrl else "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            streamKey = cleanKey,
+            shareLink = shareUrl,
+            maxStudentsCapacity = maxCapacity,
+            description = description.ifBlank { "Live online class seminar scheduled on EduLive+ platform." }
+        )
+        _liveSessions.value = listOf(newSession) + _liveSessions.value
+        return newSession
+    }
+
+    fun findOrJoinSessionByLink(linkOrCode: String): LiveSession? {
+        val cleanQuery = linkOrCode.trim()
+            .removePrefix("https://edulive.app/class/")
+            .removePrefix("edulive://live/")
+            .lowercase()
+
+        // 1. Search existing sessions
+        val matched = _liveSessions.value.find {
+            it.id.lowercase() == cleanQuery ||
+            it.streamKey.lowercase() == cleanQuery ||
+            it.shareLink.lowercase().contains(cleanQuery)
+        }
+
+        if (matched != null) return matched
+
+        // 2. If it's a URL or new link, construct a live stream room dynamically
+        val customSession = LiveSession(
+            id = "live_custom_${System.currentTimeMillis().toString().takeLast(5)}",
+            title = "Shared Seminar / Online Class ($cleanQuery)",
+            courseTitle = "Joined via Link / Code",
+            instructorName = "EduLive Faculty Host",
+            targetExam = _currentUser.value.targetExam,
+            status = "LIVE NOW",
+            viewerCount = 198,
+            startTimeFormatted = "Joined via Direct Link",
+            streamUrl = if (cleanQuery.startsWith("http")) cleanQuery else "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            streamKey = cleanQuery,
+            shareLink = if (cleanQuery.startsWith("http")) cleanQuery else "https://edulive.app/class/$cleanQuery",
+            maxStudentsCapacity = 200,
+            description = "Joined live seminar room via direct URL or class access code."
+        )
+
+        _liveSessions.value = listOf(customSession) + _liveSessions.value
+        return customSession
     }
 
     fun getLecturesForCourse(courseId: String): List<VideoLecture> {

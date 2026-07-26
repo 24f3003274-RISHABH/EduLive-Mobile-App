@@ -37,6 +37,7 @@ fun EduLiveApp(viewModel: EduViewModel = viewModel()) {
     val enrolledCourseIds by viewModel.enrolledCourseIds.collectAsStateWithLifecycle()
     val selectedCourse by viewModel.selectedCourse.collectAsStateWithLifecycle()
     val selectedLiveSession by viewModel.selectedLiveSession.collectAsStateWithLifecycle()
+    val allLiveSessions by viewModel.allLiveSessions.collectAsStateWithLifecycle()
     val liveChatMessages by viewModel.liveChatMessages.collectAsStateWithLifecycle()
     val currentPoll by viewModel.currentPoll.collectAsStateWithLifecycle()
     val isLowBandwidth by viewModel.isLowBandwidth.collectAsStateWithLifecycle()
@@ -119,6 +120,7 @@ fun EduLiveApp(viewModel: EduViewModel = viewModel()) {
 
                 2 -> LiveClassScreen(
                     session = selectedLiveSession,
+                    allSessions = allLiveSessions,
                     chatMessages = liveChatMessages,
                     poll = currentPoll,
                     isLowBandwidth = isLowBandwidth,
@@ -126,7 +128,13 @@ fun EduLiveApp(viewModel: EduViewModel = viewModel()) {
                     onSendMessage = { text, isDoubt -> viewModel.sendLiveChatMessage(text, isDoubt) },
                     onVotePoll = { optionIdx -> viewModel.votePoll(optionIdx) },
                     onToggleLowBandwidth = { viewModel.toggleLowBandwidth() },
-                    onToggleAudioOnly = { viewModel.toggleAudioOnly() }
+                    onToggleAudioOnly = { viewModel.toggleAudioOnly() },
+                    onSelectSession = { viewModel.selectLiveSession(it) },
+                    onJoinByLink = { link -> viewModel.joinLiveClassByLink(link) },
+                    onScheduleClass = { title, subject, instructor, exam, time, url, capacity, desc ->
+                        viewModel.scheduleLiveClass(title, subject, instructor, exam, time, url, capacity, desc)
+                    },
+                    showToast = { msg -> viewModel.showToast(msg) }
                 )
 
                 3 -> AIDoubtSolverScreen(

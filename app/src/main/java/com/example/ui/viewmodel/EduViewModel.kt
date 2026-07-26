@@ -64,8 +64,56 @@ class EduViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedCourse = MutableStateFlow<Course?>(repository.getAllCourses().first())
     val selectedCourse: StateFlow<Course?> = _selectedCourse.asStateFlow()
 
-    private val _selectedLiveSession = MutableStateFlow<LiveSession?>(repository.getLiveSessions().first())
+    val allLiveSessions: StateFlow<List<LiveSession>> = repository.liveSessionsFlow
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), repository.getLiveSessions())
+
+    private val _selectedLiveSession = MutableStateFlow<LiveSession?>(repository.getLiveSessions().firstOrNull())
     val selectedLiveSession: StateFlow<LiveSession?> = _selectedLiveSession.asStateFlow()
+
+    fun selectLiveSession(session: LiveSession) {
+        _selectedLiveSession.value = session
+        _currentTab.value = 2 // Switch to Live Stream Tab
+    }
+
+    fun joinLiveClassByLink(linkOrCode: String) {
+        if (linkOrCode.isBlank()) {
+            showToast("Please enter a valid class link or room code")
+            return
+        }
+        val session = repository.findOrJoinSessionByLink(linkOrCode)
+        if (session != null) {
+            _selectedLiveSession.value = session
+            _currentTab.value = 2
+            showToast("Joined live class: ${session.title}")
+        } else {
+            showToast("Could not find class for link: $linkOrCode")
+        }
+    }
+
+    fun scheduleLiveClass(
+        title: String,
+        subjectCourse: String,
+        instructor: String,
+        exam: TargetExam,
+        timeString: String,
+        streamUrl: String,
+        maxCapacity: Int,
+        description: String
+    ) {
+        val newSession = repository.scheduleNewLiveSession(
+            title = title,
+            subjectCourse = subjectCourse,
+            instructor = instructor,
+            exam = exam,
+            timeString = timeString,
+            streamUrl = streamUrl,
+            maxCapacity = maxCapacity,
+            description = description
+        )
+        _selectedLiveSession.value = newSession
+        _currentTab.value = 2
+        showToast("📢 Class Scheduled! Share link generated: ${newSession.shareLink}")
+    }
 
     // Search and Filter State
     private val _searchQuery = MutableStateFlow("")
@@ -131,11 +179,6 @@ class EduViewModel(application: Application) : AndroidViewModel(application) {
 
     fun selectCourse(course: Course) {
         _selectedCourse.value = course
-    }
-
-    fun selectLiveSession(session: LiveSession) {
-        _selectedLiveSession.value = session
-        _currentTab.value = 2 // Jump to Live Stream Player
     }
 
     fun enrollCourse(courseId: String) {
@@ -262,7 +305,7 @@ class EduViewModel(application: Application) : AndroidViewModel(application) {
         _toastMessage.value = null
     }
 
-    private fun showToast(msg: String) {
+    fun showToast(msg: String) {
         _toastMessage.value = msg
     }
 

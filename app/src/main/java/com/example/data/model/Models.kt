@@ -81,7 +81,12 @@ data class LiveSession(
     val status: String, // "LIVE NOW", "UPCOMING", "ENDED"
     val viewerCount: Int,
     val startTimeFormatted: String,
-    val isLowBandwidthAvailable: Boolean = true
+    val isLowBandwidthAvailable: Boolean = true,
+    val streamUrl: String = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    val streamKey: String = id,
+    val shareLink: String = "https://edulive.app/class/$id",
+    val maxStudentsCapacity: Int = 200,
+    val description: String = "Interactive Live Class & Seminar with real-time doubts and high-concurrency chat."
 )
 
 data class ChatMessage(
