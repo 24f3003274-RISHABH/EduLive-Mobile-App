@@ -1,9 +1,17 @@
 package com.example.ui.screens
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -33,6 +41,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.example.data.model.ChatMessage
 import com.example.data.model.LivePoll
 import com.example.data.model.LiveSession
@@ -1220,6 +1231,133 @@ fun LiveClassScreen(
 }
 
 @Composable
+fun LiveCameraPreview(
+    isCameraFront: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    var hasCameraPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        hasCameraPermission = permissions[Manifest.permission.CAMERA] == true
+    }
+
+    if (!hasCameraPermission) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(Color(0xFF0F172A))
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = GeoLiveRed.copy(alpha = 0.2f),
+                modifier = Modifier.size(56.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.VideocamOff,
+                    contentDescription = null,
+                    tint = GeoLiveRed,
+                    modifier = Modifier.padding(14.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "📷 Live Camera Access Disabled",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "EduLive requires camera access to stream live video to 200+ students.",
+                color = Color.White.copy(alpha = 0.7f),
+                fontSize = 11.sp,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = {
+                    launcher.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = GeoPrimary),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Icon(Icons.Default.Camera, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("Enable Live Camera", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    } else {
+        AndroidView(
+            factory = { ctx ->
+                val previewView = PreviewView(ctx).apply {
+                    scaleType = PreviewView.ScaleType.FILL_CENTER
+                }
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                cameraProviderFuture.addListener({
+                    try {
+                        val cameraProvider = cameraProviderFuture.get()
+                        val preview = Preview.Builder().build().also {
+                            it.setSurfaceProvider(previewView.surfaceProvider)
+                        }
+                        val cameraSelector = if (isCameraFront) {
+                            CameraSelector.DEFAULT_FRONT_CAMERA
+                        } else {
+                            CameraSelector.DEFAULT_BACK_CAMERA
+                        }
+                        cameraProvider.unbindAll()
+                        cameraProvider.bindToLifecycle(
+                            lifecycleOwner,
+                            cameraSelector,
+                            preview
+                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }, ContextCompat.getMainExecutor(ctx))
+                previewView
+            },
+            update = { previewView ->
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(previewView.context)
+                cameraProviderFuture.addListener({
+                    try {
+                        val cameraProvider = cameraProviderFuture.get()
+                        val preview = Preview.Builder().build().also {
+                            it.setSurfaceProvider(previewView.surfaceProvider)
+                        }
+                        val cameraSelector = if (isCameraFront) {
+                            CameraSelector.DEFAULT_FRONT_CAMERA
+                        } else {
+                            CameraSelector.DEFAULT_BACK_CAMERA
+                        }
+                        cameraProvider.unbindAll()
+                        cameraProvider.bindToLifecycle(
+                            lifecycleOwner,
+                            cameraSelector,
+                            preview
+                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }, ContextCompat.getMainExecutor(previewView.context))
+            },
+            modifier = modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
 fun TeacherBroadcastStudioView(
     session: LiveSession?,
     isBroadcastingLive: Boolean,
@@ -1263,23 +1401,14 @@ fun TeacherBroadcastStudioView(
                 ) {
                     // Camera Simulation Graphic Canvas
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(
-                                        Color(0xFF1E293B),
-                                        Color(0xFF0F172A),
-                                        Color(0xFF020617)
-                                    )
-                                )
-                            )
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         // Camera framing crosshair icon / Whiteboard overlay
                         if (isWhiteboardActive) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxSize()
+                                    .background(Color(0xFF0F172A))
                                     .padding(16.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
@@ -1304,38 +1433,11 @@ fun TeacherBroadcastStudioView(
                                 )
                             }
                         } else {
-                            // Camera Feed Indicator
-                            Column(
-                                modifier = Modifier.align(Alignment.Center),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Surface(
-                                    shape = CircleShape,
-                                    color = Color.White.copy(alpha = 0.15f),
-                                    modifier = Modifier.size(72.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Videocam,
-                                        contentDescription = "Camera Feed",
-                                        tint = if (isBroadcastingLive) GeoLiveRed else Color.White,
-                                        modifier = Modifier
-                                            .padding(16.dp)
-                                            .fillMaxSize()
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(10.dp))
-                                Text(
-                                    text = if (isCameraFront) "📷 Front HD Camera Active" else "📷 Back Wide Lens Active",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp
-                                )
-                                Text(
-                                    text = "1080p 60FPS • Auto Focus & Noise Suppression ON",
-                                    color = Color.White.copy(alpha = 0.7f),
-                                    fontSize = 11.sp
-                                )
-                            }
+                            // Camera Live Feed from CameraX
+                            LiveCameraPreview(
+                                isCameraFront = isCameraFront,
+                                modifier = Modifier.fillMaxSize()
+                            )
                         }
 
                         // Top Live HUD Controls
