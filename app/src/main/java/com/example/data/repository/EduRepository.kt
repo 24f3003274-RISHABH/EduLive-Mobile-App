@@ -249,7 +249,7 @@ class EduRepository(private val dao: AppDao) {
                 startTimeFormatted = "Started at 10:00 AM",
                 streamUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
                 streamKey = "jee_physics_101",
-                shareLink = "https://edulive.app/class/jee_physics_101",
+                shareLink = "https://ais-dev-ejhrxhfwsa3xlvrsvmjay2-208743066769.asia-east1.run.app?classId=jee_physics_101",
                 maxStudentsCapacity = 200,
                 description = "Master rotational motion formulas with live problem solving and instant faculty doubt clearance."
             ),
@@ -319,7 +319,7 @@ class EduRepository(private val dao: AppDao) {
         description: String
     ): LiveSession {
         val cleanKey = "class_" + System.currentTimeMillis().toString().takeLast(6)
-        val shareUrl = "https://edulive.app/class/$cleanKey"
+        val shareUrl = "https://ais-dev-ejhrxhfwsa3xlvrsvmjay2-208743066769.asia-east1.run.app?classId=$cleanKey"
         val newSession = LiveSession(
             id = "live_$cleanKey",
             title = title,
@@ -342,6 +342,9 @@ class EduRepository(private val dao: AppDao) {
     fun findOrJoinSessionByLink(linkOrCode: String): LiveSession? {
         val cleanQuery = linkOrCode.trim()
             .removePrefix("https://edulive.app/class/")
+            .removePrefix("https://ais-dev-ejhrxhfwsa3xlvrsvmjay2-208743066769.asia-east1.run.app?classId=")
+            .removePrefix("edulive://join/")
+            .removePrefix("edulive://class/")
             .removePrefix("edulive://live/")
             .lowercase()
 

@@ -997,14 +997,14 @@ fun LiveClassScreen(
                     OutlinedTextField(
                         value = joinLinkInput,
                         onValueChange = { joinLinkInput = it },
-                        placeholder = { Text("e.g. https://edulive.app/class/jee_physics_101 or room_101") },
+                        placeholder = { Text("e.g. jee_physics_101 or edulive://join/jee_physics_101") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "💡 Quick Try Examples:",
+                        text = "💡 Quick Try Class Codes:",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = GeoTextPrimary
@@ -1012,7 +1012,7 @@ fun LiveClassScreen(
                     Spacer(modifier = Modifier.height(4.dp))
                     listOf("jee_physics_101", "neet_bio_202", "upsc_polity_303").forEach { code ->
                         Text(
-                            text = "• edulive.app/class/$code",
+                            text = "• Class Code: $code",
                             fontSize = 12.sp,
                             color = GeoPrimary,
                             modifier = Modifier
@@ -1486,7 +1486,16 @@ fun TeacherBroadcastStudioView(
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
-                    val shareUrl = session?.shareLink ?: "https://edulive.app/class/${session?.id ?: "jee_physics_101"}"
+                    val classCode = session?.streamKey ?: "jee_physics_101"
+                    val shareUrl = session?.shareLink ?: "https://ais-dev-ejhrxhfwsa3xlvrsvmjay2-208743066769.asia-east1.run.app?classId=$classCode"
+                    val shareText = "🎓 *TEACHER IS LIVE NOW!*\n\n" +
+                            "📚 *Class:* ${session?.title ?: "Physics Seminar"}\n" +
+                            "🔑 *Class Access Code:* `$classCode`\n\n" +
+                            "📲 *How Students Join:*\n" +
+                            "1. Open **EduLive App**\n" +
+                            "2. Tap **'🔗 Join via Link / Code'**\n" +
+                            "3. Enter Class Code: `$classCode` (or tap direct app link: $shareUrl)\n\n" +
+                            "🚀 See you in live class!"
 
                     Surface(
                         shape = RoundedCornerShape(8.dp),
@@ -1494,13 +1503,11 @@ fun TeacherBroadcastStudioView(
                         border = BorderStroke(1.dp, GeoBorder),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = shareUrl,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = GeoPrimary,
-                            modifier = Modifier.padding(10.dp)
-                        )
+                        Column(modifier = Modifier.padding(10.dp)) {
+                            Text("🔑 Class Access Code: $classCode", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = AccentAmber)
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("🌐 App Link: $shareUrl", fontSize = 11.sp, fontWeight = FontWeight.Medium, color = GeoPrimary)
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(10.dp))
@@ -1512,15 +1519,15 @@ fun TeacherBroadcastStudioView(
                         Button(
                             onClick = {
                                 val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                clipboard.setPrimaryClip(ClipData.newPlainText("Class Link", shareUrl))
-                                showToast("📋 Link Copied! Send it on WhatsApp / Telegram.")
+                                clipboard.setPrimaryClip(ClipData.newPlainText("Class Invite", shareText))
+                                showToast("📋 Class Invite & Code Copied! Send it on WhatsApp.")
 
                                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                     type = "text/plain"
                                     putExtra(Intent.EXTRA_SUBJECT, "Join Live Class: ${session?.title ?: "Physics Seminar"}")
-                                    putExtra(Intent.EXTRA_TEXT, "🎓 Teacher is LIVE! Click link to join class: $shareUrl")
+                                    putExtra(Intent.EXTRA_TEXT, shareText)
                                 }
-                                context.startActivity(Intent.createChooser(shareIntent, "Share Class Link"))
+                                context.startActivity(Intent.createChooser(shareIntent, "Share Class Invite"))
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = GeoSecondary),
                             shape = RoundedCornerShape(10.dp),
@@ -1528,7 +1535,7 @@ fun TeacherBroadcastStudioView(
                         ) {
                             Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Share on WhatsApp", fontSize = 12.sp)
+                            Text("Share Invite on WhatsApp", fontSize = 12.sp)
                         }
 
                         OutlinedButton(
