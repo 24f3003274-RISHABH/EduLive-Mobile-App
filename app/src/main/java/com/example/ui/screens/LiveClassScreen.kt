@@ -80,6 +80,27 @@ fun LiveClassScreen(
     var isFullscreen by remember { mutableStateOf(false) }
     var isPipMode by remember { mutableStateOf(false) }
 
+    // Broadcaster vs Student Watcher Mode (0 = Student Watcher, 1 = Teacher Studio)
+    var activeViewMode by remember { mutableIntStateOf(0) }
+    var isBroadcastingLive by remember { mutableStateOf(false) }
+    var broadcastTimerSeconds by remember { mutableIntStateOf(0) }
+    var isMicMuted by remember { mutableStateOf(false) }
+    var isCameraFront by remember { mutableStateOf(true) }
+    var isWhiteboardActive by remember { mutableStateOf(false) }
+    var showTeacherGuideDialog by remember { mutableStateOf(false) }
+
+    // Live Broadcast Timer Effect
+    LaunchedEffect(isBroadcastingLive) {
+        if (isBroadcastingLive) {
+            while (true) {
+                delay(1000)
+                broadcastTimerSeconds++
+            }
+        } else {
+            broadcastTimerSeconds = 0
+        }
+    }
+
     // Dialog States
     var showJoinLinkDialog by remember { mutableStateOf(false) }
     var showScheduleClassDialog by remember { mutableStateOf(false) }
@@ -117,6 +138,86 @@ fun LiveClassScreen(
             .fillMaxSize()
             .background(GeoBackground)
     ) {
+        // --- 0. Role Mode Switcher (Student Watcher vs Teacher Studio) ---
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 2.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = activeViewMode == 0,
+                    onClick = { activeViewMode = 0 },
+                    label = { Text("📺 Watch Stream (Student)", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                    leadingIcon = { Icon(Icons.Default.LiveTv, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    modifier = Modifier.weight(1f)
+                )
+
+                FilterChip(
+                    selected = activeViewMode == 1,
+                    onClick = { activeViewMode = 1 },
+                    label = { Text("🎥 Teacher Studio (Host Live)", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                    leadingIcon = { Icon(Icons.Default.Videocam, contentDescription = null, modifier = Modifier.size(16.dp)) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = GeoLiveRed,
+                        selectedLabelColor = Color.White,
+                        selectedLeadingIconColor = Color.White
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
+
+                IconButton(
+                    onClick = { showTeacherGuideDialog = true },
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.HelpOutline,
+                        contentDescription = "How Live Streaming Works Guide",
+                        tint = GeoPrimary
+                    )
+                }
+            }
+        }
+
+        if (activeViewMode == 1) {
+            // --- TEACHER MOBILE BROADCAST STUDIO MODE ---
+            TeacherBroadcastStudioView(
+                session = session,
+                isBroadcastingLive = isBroadcastingLive,
+                broadcastTimerSeconds = broadcastTimerSeconds,
+                isMicMuted = isMicMuted,
+                isCameraFront = isCameraFront,
+                isWhiteboardActive = isWhiteboardActive,
+                onToggleBroadcast = {
+                    isBroadcastingLive = !isBroadcastingLive
+                    if (isBroadcastingLive) {
+                        showToast("🔴 YOU ARE NOW LIVE! 198 Students connected.")
+                    } else {
+                        showToast("⏹️ Live broadcast ended.")
+                    }
+                },
+                onToggleMic = {
+                    isMicMuted = !isMicMuted
+                    showToast(if (isMicMuted) "🎙️ Microphone Muted" else "🎙️ Microphone Active")
+                },
+                onToggleCamera = {
+                    isCameraFront = !isCameraFront
+                    showToast(if (isCameraFront) "📷 Switched to Front Camera" else "📷 Switched to Back Camera")
+                },
+                onToggleWhiteboard = {
+                    isWhiteboardActive = !isWhiteboardActive
+                    showToast(if (isWhiteboardActive) "✏️ Digital Whiteboard Overlay ON" else "✏️ Digital Whiteboard OFF")
+                },
+                onOpenGuide = { showTeacherGuideDialog = true },
+                showToast = showToast
+            )
+        } else {
+            // --- STUDENT LIVE CLASSROOM WATCHER MODE ---
         // --- 1. Top Link & Schedule Quick Bar ---
         Surface(
             modifier = Modifier.fillMaxWidth(),
@@ -802,6 +903,81 @@ fun LiveClassScreen(
                 }
             }
         }
+        } // End of activeViewMode == 0 (Student Watcher Mode)
+    } // End of main Column
+
+    // --- TEACHER GUIDE DIALOG: How Live Streaming & Student Joining Works ---
+    if (showTeacherGuideDialog) {
+        AlertDialog(
+            onDismissRequest = { showTeacherGuideDialog = false },
+            icon = { Icon(Icons.Default.LiveTv, contentDescription = null, tint = GeoLiveRed) },
+            title = { Text("📡 How Live Streaming Works", fontWeight = FontWeight.Bold) },
+            text = {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    item {
+                        Text(
+                            text = "Welcome Teacher! Here is how your students join your live classes smoothly without technical issues:",
+                            fontSize = 13.sp,
+                            color = GeoTextSecondary
+                        )
+                    }
+
+                    item {
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = GeoPrimaryContainer.copy(alpha = 0.5f),
+                            border = BorderStroke(1.dp, GeoPrimary.copy(alpha = 0.3f))
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text("🎥 Method 1: Mobile Camera Broadcast", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = GeoPrimary)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text("1. Switch to 'Teacher Studio' tab at the top.\n2. Tap '🔴 START LIVE CAMERA STREAM'.\n3. Tap 'Copy & Share WhatsApp Link'.\n4. Students tap the link to join directly in the app!", fontSize = 11.sp, color = GeoTextPrimary)
+                            }
+                        }
+                    }
+
+                    item {
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = GeoSecondaryContainer.copy(alpha = 0.5f),
+                            border = BorderStroke(1.dp, GeoSecondary.copy(alpha = 0.3f))
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text("💻 Method 2: OBS Studio / PC Streaming", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = GeoSecondary)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text("1. Copy the RTMP Server & Stream Key provided in Teacher Studio.\n2. Paste them into OBS Studio or Streamlabs on PC.\n3. Click 'Start Streaming' in OBS to broadcast 4K 60fps HD live video!", fontSize = 11.sp, color = GeoTextPrimary)
+                            }
+                        }
+                    }
+
+                    item {
+                        Surface(
+                            shape = RoundedCornerShape(10.dp),
+                            color = AccentAmber.copy(alpha = 0.15f),
+                            border = BorderStroke(1.dp, AccentAmber.copy(alpha = 0.4f))
+                        ) {
+                            Column(modifier = Modifier.padding(10.dp)) {
+                                Text("👥 Method 3: 200+ Students Joining via Link", fontWeight = FontWeight.Bold, fontSize = 12.sp, color = AccentAmber)
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text("Students do not need complex logins! They can paste the link under 'Join via Link' or open the link directly from WhatsApp or Telegram.", fontSize = 11.sp, color = GeoTextPrimary)
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showTeacherGuideDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = GeoPrimary),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Got It, Let's Stream!")
+                }
+            }
+        )
     }
 
     // --- DIALOG 1: Join Class via Link / Code ---
@@ -1040,5 +1216,356 @@ fun LiveClassScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+fun TeacherBroadcastStudioView(
+    session: LiveSession?,
+    isBroadcastingLive: Boolean,
+    broadcastTimerSeconds: Int,
+    isMicMuted: Boolean,
+    isCameraFront: Boolean,
+    isWhiteboardActive: Boolean,
+    onToggleBroadcast: () -> Unit,
+    onToggleMic: () -> Unit,
+    onToggleCamera: () -> Unit,
+    onToggleWhiteboard: () -> Unit,
+    onOpenGuide: () -> Unit,
+    showToast: (String) -> Unit
+) {
+    val context = LocalContext.current
+    val formatTime = { sec: Int ->
+        val m = sec / 60
+        val s = sec % 60
+        String.format("%02d:%02d", m, s)
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // --- 1. Camera Studio Viewport Frame ---
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(260.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A)),
+                border = BorderStroke(2.dp, if (isBroadcastingLive) GeoLiveRed else GeoBorder)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Camera Simulation Graphic Canvas
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(
+                                        Color(0xFF1E293B),
+                                        Color(0xFF0F172A),
+                                        Color(0xFF020617)
+                                    )
+                                )
+                            )
+                    ) {
+                        // Camera framing crosshair icon / Whiteboard overlay
+                        if (isWhiteboardActive) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Brush,
+                                    contentDescription = "Whiteboard",
+                                    tint = AiCyan,
+                                    modifier = Modifier.size(48.dp)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "📐 DIGITAL WHITEBOARD BROADCAST OVERLAY",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp,
+                                    color = AiCyan
+                                )
+                                Text(
+                                    text = "Equations & Notes are being recorded live for 200+ students",
+                                    fontSize = 10.sp,
+                                    color = Color.White.copy(alpha = 0.7f)
+                                )
+                            }
+                        } else {
+                            // Camera Feed Indicator
+                            Column(
+                                modifier = Modifier.align(Alignment.Center),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Surface(
+                                    shape = CircleShape,
+                                    color = Color.White.copy(alpha = 0.15f),
+                                    modifier = Modifier.size(72.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Videocam,
+                                        contentDescription = "Camera Feed",
+                                        tint = if (isBroadcastingLive) GeoLiveRed else Color.White,
+                                        modifier = Modifier
+                                            .padding(16.dp)
+                                            .fillMaxSize()
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = if (isCameraFront) "📷 Front HD Camera Active" else "📷 Back Wide Lens Active",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp
+                                )
+                                Text(
+                                    text = "1080p 60FPS • Auto Focus & Noise Suppression ON",
+                                    color = Color.White.copy(alpha = 0.7f),
+                                    fontSize = 11.sp
+                                )
+                            }
+                        }
+
+                        // Top Live HUD Controls
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                                .align(Alignment.TopStart),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (isBroadcastingLive) GeoLiveRed else Color.DarkGray
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(8.dp)
+                                            .clip(CircleShape)
+                                            .background(Color.White)
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = if (isBroadcastingLive) "🔴 LIVE BROADCAST (${formatTime(broadcastTimerSeconds)})" else "READY TO BROADCAST",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp,
+                                        color = Color.White
+                                    )
+                                }
+                            }
+
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = Color.Black.copy(alpha = 0.6f)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(Icons.Default.Group, contentDescription = null, tint = AccentAmber, modifier = Modifier.size(14.dp))
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = if (isBroadcastingLive) "198 Students Connected" else "0 / 200 Max",
+                                        fontSize = 11.sp,
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
+
+                        // Bottom Quick Controls on Camera Overlay
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                                .align(Alignment.BottomCenter),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = onToggleCamera,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White.copy(alpha = 0.25f))
+                            ) {
+                                Icon(Icons.Default.FlipCameraAndroid, contentDescription = "Flip Camera", tint = Color.White)
+                            }
+
+                            IconButton(
+                                onClick = onToggleMic,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isMicMuted) GeoLiveRed else Color.White.copy(alpha = 0.25f))
+                            ) {
+                                Icon(
+                                    imageVector = if (isMicMuted) Icons.Default.MicOff else Icons.Default.Mic,
+                                    contentDescription = "Mute Mic",
+                                    tint = Color.White
+                                )
+                            }
+
+                            IconButton(
+                                onClick = onToggleWhiteboard,
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isWhiteboardActive) AiCyan else Color.White.copy(alpha = 0.25f))
+                            ) {
+                                Icon(Icons.Default.Brush, contentDescription = "Whiteboard", tint = if (isWhiteboardActive) Color.Black else Color.White)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- 2. Main Broadcast Action Trigger ---
+        item {
+            Button(
+                onClick = onToggleBroadcast,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isBroadcastingLive) Color(0xFFDC2626) else GeoPrimary
+                ),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp)
+            ) {
+                Icon(
+                    imageVector = if (isBroadcastingLive) Icons.Default.StopCircle else Icons.Default.RadioButtonChecked,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (isBroadcastingLive) "⏹️ END LIVE BROADCAST NOW" else "🔴 START LIVE MOBILE CAMERA STREAM NOW",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
+                )
+            }
+        }
+
+        // --- 3. Class Link Sharing Hub (WhatsApp & Telegram) ---
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = GeoSurfaceVariant),
+                border = BorderStroke(1.dp, GeoBorder)
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("🔗 Class Direct Access Link", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = GeoTextPrimary)
+                        Surface(shape = RoundedCornerShape(6.dp), color = AccentAmber) {
+                            Text("Share for 200+ Students", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color.Black, modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    val shareUrl = session?.shareLink ?: "https://edulive.app/class/${session?.id ?: "jee_physics_101"}"
+
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        border = BorderStroke(1.dp, GeoBorder),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = shareUrl,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = GeoPrimary,
+                            modifier = Modifier.padding(10.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                clipboard.setPrimaryClip(ClipData.newPlainText("Class Link", shareUrl))
+                                showToast("📋 Link Copied! Send it on WhatsApp / Telegram.")
+
+                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_SUBJECT, "Join Live Class: ${session?.title ?: "Physics Seminar"}")
+                                    putExtra(Intent.EXTRA_TEXT, "🎓 Teacher is LIVE! Click link to join class: $shareUrl")
+                                }
+                                context.startActivity(Intent.createChooser(shareIntent, "Share Class Link"))
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = GeoSecondary),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Share on WhatsApp", fontSize = 12.sp)
+                        }
+
+                        OutlinedButton(
+                            onClick = onOpenGuide,
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Icon(Icons.Default.Help, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Guide", fontSize = 12.sp)
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- 4. OBS Studio / PC Live Broadcaster Settings ---
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                border = BorderStroke(1.dp, GeoBorder)
+            ) {
+                Column(modifier = Modifier.padding(14.dp)) {
+                    Text("💻 Want to Stream from PC / OBS Studio?", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = GeoTextPrimary)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Copy these RTMP credentials into OBS Studio -> Settings -> Stream:", fontSize = 11.sp, color = GeoTextSecondary)
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Server RTMP URL:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = GeoTextPrimary)
+                    Text("rtmp://live.edulive.app/app/", fontSize = 11.sp, color = GeoSecondary)
+
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("Stream Key:", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = GeoTextPrimary)
+                    Text("live_key_${session?.id ?: "jee_physics_101"}", fontSize = 11.sp, color = GeoLiveRed)
+                }
+            }
+        }
     }
 }
