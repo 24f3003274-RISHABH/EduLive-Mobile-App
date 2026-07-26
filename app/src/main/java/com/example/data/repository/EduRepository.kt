@@ -53,6 +53,13 @@ class EduRepository(private val dao: AppDao) {
         _currentUser.value = _currentUser.value.copy(targetExam = exam)
     }
 
+    fun updateUserNameAndEmail(name: String, email: String) {
+        _currentUser.value = _currentUser.value.copy(
+            name = if (name.isNotBlank()) name else _currentUser.value.name,
+            email = if (email.isNotBlank()) email else _currentUser.value.email
+        )
+    }
+
     fun setUserRole(role: UserRole) {
         _currentUser.value = _currentUser.value.copy(role = role)
     }

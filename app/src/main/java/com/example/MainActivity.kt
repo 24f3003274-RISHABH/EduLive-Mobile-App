@@ -53,6 +53,7 @@ fun EduLiveApp(viewModel: EduViewModel = viewModel()) {
     val isTestSubmitted by viewModel.isTestSubmitted.collectAsStateWithLifecycle()
     val lastTestScore by viewModel.lastTestScore.collectAsStateWithLifecycle()
 
+    val firebaseUser by viewModel.firebaseUser.collectAsStateWithLifecycle()
     val downloads by viewModel.downloads.collectAsStateWithLifecycle()
     val bookmarks by viewModel.bookmarks.collectAsStateWithLifecycle()
     val testAttempts by viewModel.testAttempts.collectAsStateWithLifecycle()
@@ -67,6 +68,7 @@ fun EduLiveApp(viewModel: EduViewModel = viewModel()) {
                 onSearchQueryChange = { viewModel.setSearchQuery(it) },
                 onExamSelected = { viewModel.setTargetExam(it) },
                 onRoleSelected = { viewModel.setUserRole(it) },
+                onOpenAuth = { viewModel.setTab(7) },
                 toastMessage = toastMessage,
                 onClearToast = { viewModel.clearToast() }
             )
@@ -164,6 +166,19 @@ fun EduLiveApp(viewModel: EduViewModel = viewModel()) {
                     invoices = viewModel.getInvoices(),
                     parentReport = viewModel.getParentReport(),
                     onDeleteDownload = { viewModel.deleteDownload(it) }
+                )
+
+                7 -> SignInScreen(
+                    currentFirebaseUser = firebaseUser,
+                    onSignInSuccess = { email, displayName ->
+                        viewModel.handleSignInSuccess(email, displayName)
+                    },
+                    onSignOut = {
+                        viewModel.setTab(0)
+                    },
+                    showToast = { msg ->
+                        viewModel.handleSignInSuccess(currentUser.email, currentUser.name)
+                    }
                 )
             }
         }

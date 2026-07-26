@@ -34,6 +34,7 @@ fun EduTopAppBar(
     onSearchQueryChange: (String) -> Unit,
     onExamSelected: (TargetExam) -> Unit,
     onRoleSelected: (UserRole) -> Unit,
+    onOpenAuth: () -> Unit = {},
     toastMessage: String?,
     onClearToast: () -> Unit
 ) {
@@ -256,6 +257,18 @@ fun EduTopAppBar(
                         imageVector = if (isSearching) Icons.Default.Close else Icons.Outlined.Search,
                         contentDescription = "Search",
                         tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                // Auth / Account Profile Button
+                IconButton(
+                    onClick = onOpenAuth,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = "Account & Sign In",
+                        tint = GeoPrimary
                     )
                 }
             }

@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.local.AppDatabase
 import com.example.data.model.*
 import com.example.data.repository.EduRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -14,10 +16,37 @@ class EduViewModel(application: Application) : AndroidViewModel(application) {
     private val db = AppDatabase.getDatabase(application)
     private val repository = EduRepository(db.appDao())
 
+    // Firebase Auth State
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    private val _firebaseUser = MutableStateFlow<FirebaseUser?>(null)
+    val firebaseUser: StateFlow<FirebaseUser?> = _firebaseUser.asStateFlow()
+
     val currentUser = repository.currentUser
     val enrolledCourseIds = repository.enrolledCourseIds
     val liveChatMessages = repository.liveChatMessages
     val currentPoll = repository.currentPoll
+
+    init {
+        try {
+            _firebaseUser.value = auth.currentUser
+            auth.addAuthStateListener { firebaseAuth ->
+                val fUser = firebaseAuth.currentUser
+                _firebaseUser.value = fUser
+                if (fUser != null) {
+                    val name = fUser.displayName ?: fUser.email?.substringBefore("@") ?: "EduLive Student"
+                    repository.updateUserNameAndEmail(name, fUser.email ?: "")
+                }
+            }
+        } catch (e: Exception) {
+            // Firebase may fail if google-services.json missing in local build environment, handled gracefully
+        }
+    }
+
+    fun handleSignInSuccess(email: String, displayName: String) {
+        repository.updateUserNameAndEmail(displayName, email)
+        showToast("Authenticated as $displayName ($email)")
+        _currentTab.value = 0 // Navigate to Home Screen
+    }
 
     val downloads: StateFlow<List<DownloadEntity>> = repository.allDownloads
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
