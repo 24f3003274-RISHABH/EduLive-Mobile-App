@@ -74,6 +74,7 @@ fun LiveClassScreen(
     onToggleAudioOnly: () -> Unit,
     onSelectSession: (LiveSession) -> Unit = {},
     onJoinByLink: (String) -> Unit = {},
+    onStartBroadcast: (LiveSession?) -> Unit = {},
     onScheduleClass: (String, String, String, TargetExam, String, String, Int, String) -> Unit = { _, _, _, _, _, _, _, _ -> },
     showToast: (String) -> Unit = {}
 ) {
@@ -207,7 +208,7 @@ fun LiveClassScreen(
                 onToggleBroadcast = {
                     isBroadcastingLive = !isBroadcastingLive
                     if (isBroadcastingLive) {
-                        showToast("🔴 YOU ARE NOW LIVE! 198 Students connected.")
+                        onStartBroadcast(session)
                     } else {
                         showToast("⏹️ Live broadcast ended.")
                     }

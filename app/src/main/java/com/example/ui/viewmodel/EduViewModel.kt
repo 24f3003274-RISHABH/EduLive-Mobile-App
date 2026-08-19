@@ -76,18 +76,35 @@ class EduViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun joinLiveClassByLink(linkOrCode: String) {
-        if (linkOrCode.isBlank()) {
-            showToast("Please enter a valid class link or room code")
-            return
-        }
         val session = repository.findOrJoinSessionByLink(linkOrCode)
-        if (session != null) {
-            _selectedLiveSession.value = session
-            _currentTab.value = 2
-            showToast("Joined live class: ${session.title}")
-        } else {
-            showToast("Could not find class for link: $linkOrCode")
-        }
+        _selectedLiveSession.value = session
+        _currentTab.value = 2
+        showToast("🎓 Joined Live Stream: ${session.title}")
+    }
+
+    fun startTeacherLiveBroadcast(currentSession: LiveSession?) {
+        val activeSession = (currentSession ?: _selectedLiveSession.value)?.copy(
+            status = "LIVE NOW",
+            viewerCount = 198,
+            startTimeFormatted = "LIVE NOW"
+        ) ?: LiveSession(
+            id = "live_physics_101",
+            title = "Physics Live Seminar - Rotational Mechanics",
+            courseTitle = "JEE Advanced Physics",
+            instructorName = currentUser.value.name,
+            targetExam = currentUser.value.targetExam,
+            status = "LIVE NOW",
+            viewerCount = 198,
+            startTimeFormatted = "LIVE NOW",
+            streamUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            streamKey = "jee_physics_101",
+            shareLink = "https://ais-dev-ejhrxhfwsa3xlvrsvmjay2-208743066769.asia-east1.run.app?classId=jee_physics_101",
+            maxStudentsCapacity = 200,
+            description = "Live mobile camera broadcast with real-time doubt solver."
+        )
+        repository.updateLiveSession(activeSession)
+        _selectedLiveSession.value = activeSession
+        showToast("🔴 YOU ARE NOW LIVE! Class Code: ${activeSession.streamKey}")
     }
 
     fun scheduleLiveClass(

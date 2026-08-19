@@ -339,39 +339,75 @@ class EduRepository(private val dao: AppDao) {
         return newSession
     }
 
-    fun findOrJoinSessionByLink(linkOrCode: String): LiveSession? {
-        val cleanQuery = linkOrCode.trim()
-            .removePrefix("https://edulive.app/class/")
-            .removePrefix("https://ais-dev-ejhrxhfwsa3xlvrsvmjay2-208743066769.asia-east1.run.app?classId=")
-            .removePrefix("edulive://join/")
-            .removePrefix("edulive://class/")
-            .removePrefix("edulive://live/")
-            .lowercase()
+    fun updateLiveSession(updated: LiveSession) {
+        val current = _liveSessions.value.toMutableList()
+        val idx = current.indexOfFirst { it.id == updated.id || it.streamKey == updated.streamKey }
+        if (idx >= 0) {
+            current[idx] = updated
+        } else {
+            current.add(0, updated)
+        }
+        _liveSessions.value = current
+    }
+
+    fun findOrJoinSessionByLink(linkOrCode: String): LiveSession {
+        val raw = linkOrCode.trim()
+        if (raw.isBlank()) {
+            return _liveSessions.value.firstOrNull() ?: LiveSession(
+                id = "live_physics_101",
+                title = "Physics Live Seminar - Rotational Mechanics",
+                courseTitle = "JEE Advanced Physics",
+                instructorName = "Prof. R. Sharma (IIT Bombay Alumnus)",
+                targetExam = TargetExam.JEE_MAIN,
+                status = "LIVE NOW",
+                viewerCount = 198,
+                startTimeFormatted = "Started at 10:00 AM",
+                streamUrl = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                streamKey = "jee_physics_101",
+                shareLink = "https://ais-dev-ejhrxhfwsa3xlvrsvmjay2-208743066769.asia-east1.run.app?classId=jee_physics_101",
+                maxStudentsCapacity = 200,
+                description = "Master rotational motion formulas with live problem solving and instant faculty doubt clearance."
+            )
+        }
+
+        var cleanKey = raw
+        if (cleanKey.contains("classId=")) {
+            cleanKey = cleanKey.substringAfter("classId=").substringBefore("&")
+        } else if (cleanKey.contains("/class/")) {
+            cleanKey = cleanKey.substringAfter("/class/").substringBefore("?").substringBefore("/")
+        } else if (cleanKey.contains("://join/")) {
+            cleanKey = cleanKey.substringAfter("://join/").substringBefore("/")
+        }
+        cleanKey = cleanKey.removePrefix("edulive://").removePrefix("https://").removePrefix("http://").trim()
+
+        if (cleanKey.isBlank()) {
+            cleanKey = "jee_physics_101"
+        }
 
         // 1. Search existing sessions
         val matched = _liveSessions.value.find {
-            it.id.lowercase() == cleanQuery ||
-            it.streamKey.lowercase() == cleanQuery ||
-            it.shareLink.lowercase().contains(cleanQuery)
+            it.id.equals(cleanKey, ignoreCase = true) ||
+            it.streamKey.equals(cleanKey, ignoreCase = true) ||
+            it.shareLink.contains(cleanKey, ignoreCase = true)
         }
 
         if (matched != null) return matched
 
         // 2. If it's a URL or new link, construct a live stream room dynamically
         val customSession = LiveSession(
-            id = "live_custom_${System.currentTimeMillis().toString().takeLast(5)}",
-            title = "Shared Seminar / Online Class ($cleanQuery)",
-            courseTitle = "Joined via Link / Code",
-            instructorName = "EduLive Faculty Host",
+            id = "live_$cleanKey",
+            title = "Live Class Room ($cleanKey)",
+            courseTitle = "Joined via Live Code / Link",
+            instructorName = "EduLive Faculty Broadcaster",
             targetExam = _currentUser.value.targetExam,
             status = "LIVE NOW",
             viewerCount = 198,
-            startTimeFormatted = "Joined via Direct Link",
-            streamUrl = if (cleanQuery.startsWith("http")) cleanQuery else "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            streamKey = cleanQuery,
-            shareLink = if (cleanQuery.startsWith("http")) cleanQuery else "https://edulive.app/class/$cleanQuery",
+            startTimeFormatted = "LIVE NOW",
+            streamUrl = if (raw.startsWith("http") && (raw.endsWith(".mp4") || raw.endsWith(".m3u8"))) raw else "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            streamKey = cleanKey,
+            shareLink = "https://ais-dev-ejhrxhfwsa3xlvrsvmjay2-208743066769.asia-east1.run.app?classId=$cleanKey",
             maxStudentsCapacity = 200,
-            description = "Joined live seminar room via direct URL or class access code."
+            description = "Joined live seminar room via direct URL or class access code ($cleanKey)."
         )
 
         _liveSessions.value = listOf(customSession) + _liveSessions.value

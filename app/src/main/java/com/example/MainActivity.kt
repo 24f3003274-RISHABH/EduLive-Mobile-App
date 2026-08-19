@@ -17,13 +17,28 @@ import com.example.ui.screens.*
 import com.example.ui.theme.EduLiveTheme
 import com.example.ui.viewmodel.EduViewModel
 
+import androidx.compose.runtime.LaunchedEffect
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val intentData = intent?.data
+        val initialClassId = intentData?.getQueryParameter("classId")
+            ?: intentData?.toString()
+
         setContent {
             EduLiveTheme {
-                EduLiveApp()
+                val viewModel: EduViewModel = viewModel()
+
+                LaunchedEffect(initialClassId) {
+                    if (!initialClassId.isNullOrBlank()) {
+                        viewModel.joinLiveClassByLink(initialClassId)
+                    }
+                }
+
+                EduLiveApp(viewModel = viewModel)
             }
         }
     }
@@ -131,6 +146,7 @@ fun EduLiveApp(viewModel: EduViewModel = viewModel()) {
                     onToggleAudioOnly = { viewModel.toggleAudioOnly() },
                     onSelectSession = { viewModel.selectLiveSession(it) },
                     onJoinByLink = { link -> viewModel.joinLiveClassByLink(link) },
+                    onStartBroadcast = { session -> viewModel.startTeacherLiveBroadcast(session) },
                     onScheduleClass = { title, subject, instructor, exam, time, url, capacity, desc ->
                         viewModel.scheduleLiveClass(title, subject, instructor, exam, time, url, capacity, desc)
                     },
