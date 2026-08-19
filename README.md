@@ -24,8 +24,10 @@ EduLive+ strictly adheres to **Material Design 3** and features the **Geometric 
 <p align="center">
   <em>High-performance educational experience designed with Material Design 3 and Jetpack Compose</em>
 </p>
-
-
+| 🏠 Home & Exam Track | 🤖 AI Instant Doubt Solver |
+| :---: | :---: |
+| <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/home_dashboard.png" width="280" alt="Home Screen" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/ai_doubt_solver.png" width="280" alt="AI Doubt Solver Screen" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60';"/> |
+| **Personalized Learning**<br>• JEE / NEET / UPSC Selector<br>• Daily Streak & Coin System<br>• Quick Revision Hub | **AI-Powered Tutor**<br>• Photo & Voice Input<br>• Step-by-Step Solutions<br>• Instant Formula Solver |
 
 | 📝 Adaptive Test Series | 📚 Course Explorer & Batches | 👥 Multi-Role Dashboard |
 | :---: | :---: | :---: |
