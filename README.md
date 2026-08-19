@@ -19,6 +19,24 @@ EduLive+ strictly adheres to **Material Design 3** and features the **Geometric 
 
 ---
 
+## 📱 App Screenshots & Visual UI Showcase
+
+<p align="center">
+  <em>High-performance educational experience designed with Material Design 3 and Jetpack Compose</em>
+</p>
+
+| 🎥 Live Classroom & Studio | 🏠 Home & Exam Track | 🤖 AI Instant Doubt Solver |
+| :---: | :---: | :---: |
+| <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/live_class_studio.png" width="280" alt="Live Class Screen" onerror="this.src='https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/home_dashboard.png" width="280" alt="Home Screen" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/ai_doubt_solver.png" width="280" alt="AI Doubt Solver Screen" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60';"/> |
+| **Live Broadcast & Chat**<br>• CameraX Live Studio<br>• 200+ Student Capacity<br>• Real-time Live Polling | **Personalized Learning**<br>• JEE / NEET / UPSC Selector<br>• Daily Streak & Coin System<br>• Quick Revision Hub | **AI-Powered Tutor**<br>• Photo & Voice Input<br>• Step-by-Step Solutions<br>• Instant Formula Solver |
+
+| 📝 Adaptive Test Series | 📚 Course Explorer & Batches | 👥 Multi-Role Dashboard |
+| :---: | :---: | :---: |
+| <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/test_series_exam.png" width="280" alt="Test Series Screen" onerror="this.src='https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/courses_batches.png" width="280" alt="Courses Screen" onerror="this.src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/parent_faculty_dash.png" width="280" alt="Dashboard Screen" onerror="this.src='https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60';"/> |
+| **Exam Simulation Engine**<br>• Real-Time Countdown Timer<br>• Interactive Question Grid<br>• Subject-Wise Analytics | **Curriculum Discovery**<br>• Comprehensive Syllabus Roadmaps<br>• Downloadable PDF Notes<br>• One-Tap Batch Enrollment | **Multi-Persona Control**<br>• Student Progress Insights<br>• Faculty Studio Analytics<br>• Parent Attendance Portal |
+
+---
+
 ## ✨ Key Features
 
 - 📹 **Live Classes & Interactive Chat**: Low-latency live video player simulation, live chat stream, live polling, raise hand, and PDF lecture notes downloads.
@@ -93,7 +111,7 @@ com.example
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/EduLiveApp.git
+   git clone https://github.com/24f3003274-RISHABH/EduLiveApp.git
    cd EduLiveApp
    ```
 
