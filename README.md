@@ -1,11 +1,11 @@
-# 🎓 EduLive+ | EdTech & Live Online Learning Android App
+# 🎓 EduLive+ | EdTech & Smart Learning Android App
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.9+-7F52FF.svg?style=flat&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-M3-4285F4.svg?style=flat&logo=android&logoColor=white)](https://developer.android.com/jetpack/compose)
 [![Material 3](https://img.shields.io/badge/Design-Geometric%20Balance-0061A4.svg?style=flat)](https://m3.material.io)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**EduLive+** is a modern, high-performance Android application built for competitive exam preparation (JEE, NEET, UPSC, SSC, CBSE). Powered by **Jetpack Compose** and structured with **Clean MVVM Architecture**, EduLive+ delivers live interactive classes, AI-powered instant doubt resolution, community study notes, adaptive practice test series, and comprehensive multi-role management (Student, Teacher, Parent).
+**EduLive+** is a modern, high-performance Android application built for competitive exam preparation (JEE, NEET, UPSC, SSC, CBSE). Powered by **Jetpack Compose** and structured with **Clean MVVM Architecture**, EduLive+ delivers AI-powered instant doubt resolution, verified community study notes, adaptive practice test series, structured video lecture courses, and comprehensive multi-role management (Student, Teacher, Parent).
 
 ---
 
@@ -14,7 +14,7 @@
 EduLive+ strictly adheres to **Material Design 3** and features the **Geometric Balance** design theme:
 - **Primary Indigo & Deep Ocean (`#0061A4` / `#D1E4FF`)**: Balanced headers, rounded geometric cards (24dp–28dp border radii), and continuous progress meters.
 - **Secondary Royal Lavender (`#6750A4` / `#EADDFF`)**: Accent hubs for practice tests, doubt solvers, and interactive tools.
-- **High-Contrast Dark & Light Surfaces (`#F8F9FF` background)**: Crisp typography hierarchy paired with dynamic status badges (`LIVE` red, success green).
+- **High-Contrast Dark & Light Surfaces (`#F8F9FF` background)**: Crisp typography hierarchy paired with dynamic status badges.
 - **Responsive Layouts**: Full Edge-to-Edge compliance with flexible `WindowInsets` and Material 3 Navigation Rails/Bars.
 
 ---
@@ -24,28 +24,28 @@ EduLive+ strictly adheres to **Material Design 3** and features the **Geometric 
 <p align="center">
   <em>High-performance educational experience designed with Material Design 3 and Jetpack Compose</em>
 </p>
-| 🏠 Home & Exam Track | 🤖 AI Instant Doubt Solver |
-| :---: | :---: |
-| <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/home_dashboard.png" width="280" alt="Home Screen" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/ai_doubt_solver.png" width="280" alt="AI Doubt Solver Screen" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60';"/> |
-| **Personalized Learning**<br>• JEE / NEET / UPSC Selector<br>• Daily Streak & Coin System<br>• Quick Revision Hub | **AI-Powered Tutor**<br>• Photo & Voice Input<br>• Step-by-Step Solutions<br>• Instant Formula Solver |
 
-| 📝 Adaptive Test Series | 📚 Course Explorer & Batches | 👥 Multi-Role Dashboard |
+| 🏠 Home & Exam Track | 🤖 AI Instant Doubt Solver | 📝 Adaptive Test Series |
 | :---: | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/test_series_exam.png" width="280" alt="Test Series Screen" onerror="this.src='https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/courses_batches.png" width="280" alt="Courses Screen" onerror="this.src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/parent_faculty_dash.png" width="280" alt="Dashboard Screen" onerror="this.src='https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60';"/> |
-| **Exam Simulation Engine**<br>• Real-Time Countdown Timer<br>• Interactive Question Grid<br>• Subject-Wise Analytics | **Curriculum Discovery**<br>• Comprehensive Syllabus Roadmaps<br>• Downloadable PDF Notes<br>• One-Tap Batch Enrollment | **Multi-Persona Control**<br>• Student Progress Insights<br>• Faculty Studio Analytics<br>• Parent Attendance Portal |
+| <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/home_dashboard.png" width="280" alt="Home Screen" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/ai_doubt_solver.png" width="280" alt="AI Doubt Solver Screen" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/test_series_exam.png" width="280" alt="Test Series Screen" onerror="this.src='https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&auto=format&fit=crop&q=60';"/> |
+| **Personalized Learning**<br>• JEE / NEET / UPSC Selector<br>• Daily Streak & Coin System<br>• Quick Revision Hub | **AI-Powered Tutor**<br>• Photo & Voice Input<br>• Step-by-Step Solutions<br>• Instant Formula Solver | **Exam Simulation Engine**<br>• Real-Time Countdown Timer<br>• Interactive Question Grid<br>• Subject-Wise Analytics |
+
+| 📚 Course Explorer & Batches | 📑 Community Study Notes | 👥 Multi-Role Dashboard |
+| :---: | :---: | :---: |
+| <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/courses_batches.png" width="280" alt="Courses Screen" onerror="this.src='https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/community_notes.png" width="280" alt="Community Notes Screen" onerror="this.src='https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/parent_faculty_dash.png" width="280" alt="Dashboard Screen" onerror="this.src='https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60';"/> |
+| **Curriculum Discovery**<br>• Comprehensive Syllabus Roadmaps<br>• Downloadable Chapter Material<br>• One-Tap Batch Enrollment | **Peer & Faculty Resource Hub**<br>• Verified PDF Downloads<br>• Chapter-Wise Categorization<br>• Bookmarks & Upvoting | **Multi-Persona Control**<br>• Student Progress Insights<br>• Faculty Academic Analytics<br>• Parent Attendance Portal |
 
 ---
 
 ## ✨ Key Features
 
-- 📹 **Live Classes & Interactive Chat**: Low-latency live video player simulation, live chat stream, live polling, raise hand, and PDF lecture notes downloads.
 - 🤖 **AI-Powered Instant Doubt Solver**: Voice and image prompt support to instantly resolve complex Physics, Chemistry, and Math queries using AI.
 - 📚 **Course Catalog & Enrollment**: Target exam filters (JEE Advanced, NEET UG, UPSC CSE, CBSE 12th, SSC CGL), batch enrollment, structured syllabus roadmaps, and pricing/discount badges.
 - 📝 **Adaptive Test Series**: Real-time timer-based mock tests, dynamic question navigator grid, review flags, and detailed score breakdown with subject-wise analytics.
 - 📑 **Community Study Notes & Resources**: Student & faculty note sharing, chapter-wise PDF downloads, upvoting system, and bookmarks.
 - 👥 **Multi-Role View Switcher**:
   - **Student View**: Dashboard, progress tracking, coin rewards, and ongoing courses.
-  - **Faculty View**: Live session host launcher, student engagement stats, revenue analytics, and batch management.
+  - **Faculty View**: Academic insights, student engagement stats, revenue analytics, and batch management.
   - **Parent View**: Real-time attendance monitoring, test performance reports, and direct faculty feedback.
 
 ---
@@ -68,7 +68,6 @@ com.example
     │   └── EduTopAppBar.kt          # App bar with Exam Selector & Role Switcher
     ├── screens                      # Feature Screen Composables
     │   ├── HomeScreen.kt            # Dashboard, Continue Learning Hero & Quick Actions
-    │   ├── LiveClassScreen.kt       # Live streaming, chat & polling interface
     │   ├── CourseExplorerScreen.kt  # Course discovery, category filter & enrollment
     │   ├── AIDoubtSolverScreen.kt   # AI tutor chat with voice/image upload
     │   ├── TestSeriesScreen.kt      # Exam engine, timer & result analytics
