@@ -25,10 +25,7 @@ EduLive+ strictly adheres to **Material Design 3** and features the **Geometric 
   <em>High-performance educational experience designed with Material Design 3 and Jetpack Compose</em>
 </p>
 
-| 🎥 Live Classroom & Studio | 🏠 Home & Exam Track | 🤖 AI Instant Doubt Solver |
-| :---: | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/live_class_studio.png" width="280" alt="Live Class Screen" onerror="this.src='https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/home_dashboard.png" width="280" alt="Home Screen" onerror="this.src='https://images.unsplash.com/photo-1509062522246-3755977927d7?w=500&auto=format&fit=crop&q=60';"/> | <img src="https://raw.githubusercontent.com/24f3003274-RISHABH/EduLiveApp/main/docs/screenshots/ai_doubt_solver.png" width="280" alt="AI Doubt Solver Screen" onerror="this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60';"/> |
-| **Live Broadcast & Chat**<br>• CameraX Live Studio<br>• 200+ Student Capacity<br>• Real-time Live Polling | **Personalized Learning**<br>• JEE / NEET / UPSC Selector<br>• Daily Streak & Coin System<br>• Quick Revision Hub | **AI-Powered Tutor**<br>• Photo & Voice Input<br>• Step-by-Step Solutions<br>• Instant Formula Solver |
+
 
 | 📝 Adaptive Test Series | 📚 Course Explorer & Batches | 👥 Multi-Role Dashboard |
 | :---: | :---: | :---: |
